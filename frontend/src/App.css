@@ -162,3 +162,77 @@ a:focus-visible,
   outline: 3px solid #2b5fa3;
   outline-offset: 2px;
 }
+
+.data-notice {
+  margin: 0 0 20px;
+  padding: 10px 14px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 480px;
+  margin-top: 16px;
+}
+.task-form label {
+  margin-top: 12px;
+  font-weight: 500;
+  color: #1e293b;
+}
+.task-form input,
+.task-form textarea,
+.task-form select {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+}
+.task-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+.form-error {
+  color: #b42318;
+  background: #fde2e1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.button-secondary {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+.button-secondary:hover {
+  background: #cbd5e1;
+}
+.button-danger {
+  background: #dc2626;
+}
+.button-danger:hover {
+  background: #b91c1c;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+.filter-bar select {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}

@@ -10,6 +10,10 @@ export function AppLayout() {
           <NavLink to="/tasks/new">Создать</NavLink>
         </nav>
       </header>
+      <p className="data-notice">
+        Изменения хранятся только в памяти этой вкладки. После обновления
+        страницы вернутся демонстрационные данные.
+      </p>
       <main>
         <Outlet />
       </main>

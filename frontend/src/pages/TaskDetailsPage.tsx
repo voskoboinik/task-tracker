@@ -1,5 +1,10 @@
-import { Link, useParams } from 'react-router'
-import { tasks } from '../data/tasks'
+import { Link, useNavigate, useParams } from 'react-router'
+import type { Task } from '../types/task'
+
+type TaskDetailsPageProps = {
+  tasks: Task[]
+  onDelete: (id: string) => void
+}
 
 const statusLabels: Record<string, string> = {
   todo: 'Не начато',
@@ -13,8 +18,9 @@ const priorityLabels: Record<string, string> = {
   high: 'Высокий',
 }
 
-export function TaskDetailsPage() {
+export function TaskDetailsPage({ tasks, onDelete }: TaskDetailsPageProps) {
   const { id } = useParams()
+  const navigate = useNavigate()
   const task = tasks.find((item) => item.id === id)
 
   if (!task) {
@@ -41,7 +47,24 @@ export function TaskDetailsPage() {
         <dt>Тег</dt>
         <dd>{task.tag}</dd>
       </dl>
-      <Link to="/tasks" className="button">К списку задач</Link>
+      <div className="form-actions">
+        <Link to="/tasks" className="button">К списку задач</Link>
+        <Link to={`/tasks/${task.id}/edit`} className="button button-secondary">
+          Редактировать
+        </Link>
+        <button
+          type="button"
+          className="button button-danger"
+          onClick={() => {
+            if (window.confirm(`Удалить задачу «${task.title}»?`)) {
+              onDelete(task.id)
+              navigate('/tasks', { replace: true })
+            }
+          }}
+        >
+          Удалить
+        </button>
+      </div>
     </section>
   )
 }
