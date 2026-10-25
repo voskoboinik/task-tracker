@@ -236,3 +236,12 @@ a:focus-visible,
   border: 1px solid #cbd5e1;
   border-radius: 8px;
 }
+.task-form [role="status"],
+.task-form [role="alert"] {
+  margin-top: 8px;
+  font-size: 14px;
+}
+.task-form select:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
