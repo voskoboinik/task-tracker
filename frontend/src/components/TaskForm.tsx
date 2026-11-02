@@ -134,6 +134,11 @@ export function TaskForm(props: TaskFormProps) {
           <button type="button" onClick={retry}>Повторить</button>
         </div>
       )}
+      {load.status === 'success' && tags.length > 0 && (
+  <button type="button" onClick={retry}>
+    Обновить справочник
+  </button>
+)}
 
       {error && <p role="alert" className="form-error">{error}</p>}
 

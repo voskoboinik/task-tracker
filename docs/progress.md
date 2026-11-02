@@ -79,3 +79,35 @@
 8. npm run build, npm run preview - проверить работу в собранной версии
 
 Коммит: см. git log -1 --oneline
+
+## Лабораторная 5
+- Создан проект Supabase, схема из двух таблиц: tags (публичный справочник,
+  PK id) и tasks (личные записи, PK id uuid, FK tag_id -> tags.id,
+  FK owner_id -> auth.users.id)
+- Ограничения: NOT NULL, UNIQUE name, CHECK на длину названия, статус,
+  приоритет и описание завершённой задачи
+- RLS включён на обеих таблицах; anon и authenticated получили только
+  SELECT на tags; у tasks прав и политик для клиента нет (до ЛР 6)
+- Порядок применения: 1) миграция 202611020001_initial_schema.sql,
+  2) seed.sql (SQL Editor)
+- Установлен @supabase/supabase-js, создан клиент src/lib/supabase.ts
+- getTags читает таблицу tags из Supabase, JSON из public/demo удалён
+- Добавлена кнопка «Обновить справочник»
+
+Схема:
+- tags: публичный справочник, PK id, имя name
+- tasks: личные записи пользователя, связь с tags по tag_id
+
+Шаги проверки:
+1. Открыть форму, в Network виден запрос к Supabase, ответ - 5 тегов
+2. Подменить имя таблицы в сервисе - ошибка и повтор, вернуть имя
+3. delete from public.tags - пустое состояние; применить seed и нажать
+   «Обновить справочник»
+4. update имени тега в SQL и «Обновить справочник» - id прежний,
+   черновик на месте
+5. Попытка insert в tags из браузера - ошибка доступа; select из tasks
+   не возвращает личных данных
+6. Без .env.local - понятная ошибка настройки
+7. npm run build, npm run preview
+
+Коммит: см. git log -1 --oneline
