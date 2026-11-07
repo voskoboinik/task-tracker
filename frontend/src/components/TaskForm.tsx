@@ -1,25 +1,31 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { TaskDraft } from '../types/task'
 import { useTags } from '../hooks/useTags'
 
 type TaskFormProps = {
   initialValues: TaskDraft
-  onSave: (draft: TaskDraft) => void
+  onSave: (draft: TaskDraft) => Promise<void>
   onCancel: () => void
 }
 
 export function TaskForm(props: TaskFormProps) {
   const [draft, setDraft] = useState(() => ({ ...props.initialValues }))
   const [error, setError] = useState('')
+  const [submitError, setSubmitError] = useState('')
+  const [pending, setPending] = useState(false)
+  const submitting = useRef(false)
 
   const { load, retry } = useTags()
   const tags = load.status === 'success' ? load.data : []
   const selectedTagExists = tags.some((tag) => tag.id === draft.tag)
   const canSave = load.status === 'success' && selectedTagExists
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (submitting.current) return
+
+    setSubmitError('')
 
     if (!canSave) {
       setError('Дождитесь справочника и выберите доступный тег.')
@@ -41,8 +47,20 @@ export function TaskForm(props: TaskFormProps) {
     }
 
     setError('')
-    props.onSave({ ...draft, title })
+    submitting.current = true
+    setPending(true)
+    try {
+      await props.onSave({ ...draft, title })
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error
+        ? err.message : 'Не удалось сохранить запись.')
+    } finally {
+      submitting.current = false
+      setPending(false)
+    }
   }
+
+  const message = error || submitError
 
   return (
     <form onSubmit={handleSubmit} noValidate className="task-form">
@@ -135,16 +153,17 @@ export function TaskForm(props: TaskFormProps) {
         </div>
       )}
       {load.status === 'success' && tags.length > 0 && (
-  <button type="button" onClick={retry}>
-    Обновить справочник
-  </button>
-)}
+        <button type="button" onClick={retry}>Обновить справочник</button>
+      )}
 
-      {error && <p role="alert" className="form-error">{error}</p>}
+      {message && <p role="alert" className="form-error">{message}</p>}
 
       <div className="form-actions">
-        <button type="submit" className="button" disabled={!canSave}>Сохранить</button>
-        <button type="button" className="button button-secondary" onClick={props.onCancel}>
+        <button type="submit" className="button" disabled={!canSave || pending}>
+          {pending ? 'Сохраняем…' : 'Сохранить'}
+        </button>
+        <button type="button" className="button button-secondary"
+          onClick={props.onCancel}>
           Отмена
         </button>
       </div>

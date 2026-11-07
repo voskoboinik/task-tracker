@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import type { Task } from '../types/task'
 
 type TaskDetailsPageProps = {
   tasks: Task[]
-  onDelete: (id: string) => void
+  onDelete: (id: string) => Promise<void>
 }
 
 const statusLabels: Record<string, string> = {
@@ -21,6 +22,8 @@ const priorityLabels: Record<string, string> = {
 export function TaskDetailsPage({ tasks, onDelete }: TaskDetailsPageProps) {
   const { id } = useParams()
   const navigate = useNavigate()
+  const [pending, setPending] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
   const task = tasks.find((item) => item.id === id)
 
   if (!task) {
@@ -31,6 +34,21 @@ export function TaskDetailsPage({ tasks, onDelete }: TaskDetailsPageProps) {
         <Link to="/tasks" className="button">К списку задач</Link>
       </section>
     )
+  }
+
+  async function handleDelete(current: Task) {
+    if (pending) return
+    if (!window.confirm(`Удалить задачу «${current.title}»?`)) return
+    setDeleteError('')
+    setPending(true)
+    try {
+      await onDelete(current.id)
+      navigate('/tasks', { replace: true })
+    } catch (err: unknown) {
+      setDeleteError(err instanceof Error
+        ? err.message : 'Не удалось удалить задачу.')
+      setPending(false)
+    }
   }
 
   return (
@@ -47,6 +65,9 @@ export function TaskDetailsPage({ tasks, onDelete }: TaskDetailsPageProps) {
         <dt>Тег</dt>
         <dd>{task.tag}</dd>
       </dl>
+      {deleteError && (
+        <p role="alert" className="form-error">{deleteError}</p>
+      )}
       <div className="form-actions">
         <Link to="/tasks" className="button">К списку задач</Link>
         <Link to={`/tasks/${task.id}/edit`} className="button button-secondary">
@@ -55,14 +76,10 @@ export function TaskDetailsPage({ tasks, onDelete }: TaskDetailsPageProps) {
         <button
           type="button"
           className="button button-danger"
-          onClick={() => {
-            if (window.confirm(`Удалить задачу «${task.title}»?`)) {
-              onDelete(task.id)
-              navigate('/tasks', { replace: true })
-            }
-          }}
+          disabled={pending}
+          onClick={() => handleDelete(task)}
         >
-          Удалить
+          {pending ? 'Удаляем…' : 'Удалить'}
         </button>
       </div>
     </section>
